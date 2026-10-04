@@ -4,7 +4,7 @@ import plotly.express as px
 import queries as q
 from utils import build_params
 
-st.set_page_config(page_title="Cart2Insights", layout="wide", page_icon="🛒")
+st.set_page_config(page_title="Cart2Insights", layout="wide")
 
 DARK = "plotly_dark"
 ACCENT = "#00C896"
@@ -12,9 +12,9 @@ ACCENT = "#00C896"
 st.title("Cart2Insights: E-Commerce Performance Dashboard")
 st.caption("Decoding e-commerce performance across sales, customers, sellers, delivery, and reviews.")
 
-# ---- Sidebar filters (form = runs once on submit, not on every click) ----
+# ---- Sidebar filters ----
 states, categories = q.filter_options()
-st.sidebar.header("🔍 Filters")
+st.sidebar.header("Filters")
 with st.sidebar.form("filters_form"):
     date_range = st.date_input(
         "Order date range",
@@ -37,20 +37,19 @@ with tabs[0]:
     k = q.overview_kpis(p).iloc[0]
     cols = st.columns(6)
     kpis = [
-        ( "Revenue", f"R$ {k.total_revenue:,.0f}"),
+        ("Revenue", f"R$ {k.total_revenue:,.0f}"),
         ("Orders", f"{k.total_orders:,}"),
-        ( "Customers", f"{k.total_customers:,}"),
-        ( "Sellers", f"{k.total_sellers:,}"),
+        ("Customers", f"{k.total_customers:,}"),
+        ("Sellers", f"{k.total_sellers:,}"),
         ("Avg Order Value", f"R$ {k.avg_order_value:,.2f}" if pd.notna(k.avg_order_value) else "—"),
-        ( "Avg Review", f"{k.avg_review_score:.2f}" if pd.notna(k.avg_review_score) else "—"),
+        ("Avg Review", f"{k.avg_review_score:.2f}" if pd.notna(k.avg_review_score) else "—"),
     ]
-    for col, (icon, label, val) in zip(cols, kpis):
+    for col, (label, val) in zip(cols, kpis):
         with col.container(border=True):
-            st.markdown(f"{icon} **{label}**")
+            st.markdown(f"**{label}**")
             st.markdown(f"### {val}")
 
-        st.markdown("")  # spacing
-        
+    st.markdown("")
     c1, c2 = st.columns([2, 1])
 
     with c1:
@@ -68,6 +67,15 @@ with tabs[0]:
         fig.update_traces(textinfo="label+percent")
         st.plotly_chart(fig, use_container_width=True)
 
+    st.subheader("Key Insights")
+    st.info(
+        "Delivery delays significantly hurt satisfaction — on-time orders average "
+        "4.29 stars vs 2.57 stars for delayed ones (Welch's T-test, p < 0.001).\n\n"
+        "Order value varies significantly across product categories — from R$71 "
+        "(telephony) to R$201 (watches_gifts) (One-Way ANOVA + Kruskal-Wallis, p < 0.001).\n\n"
+        "Payment method is associated with order outcome — vouchers show ~2.4x the "
+        "problem-order rate of credit cards (Chi-Square, p < 0.001)."
+    )
 
 # ---------- 2. Sales ----------
 with tabs[1]:
@@ -136,13 +144,13 @@ with tabs[4]:
     pct_late = (d.late_orders / d.delivered_orders * 100) if d.delivered_orders else 0
     c1, c2, c3 = st.columns(3)
     with c1.container(border=True):
-        st.markdown("🚚 **Avg Delivery Days**")
+        st.markdown("**Avg Delivery Days**")
         st.markdown(f"### {d.avg_delivery_days:.1f}" if pd.notna(d.avg_delivery_days) else "### —")
     with c2.container(border=True):
-        st.markdown("⏰ **% Delayed**")
+        st.markdown("**% Delayed**")
         st.markdown(f"### {pct_late:.1f}%")
     with c3.container(border=True):
-        st.markdown("📦 **Delivered Orders**")
+        st.markdown("**Delivered Orders**")
         st.markdown(f"### {d.delivered_orders:,}")
 
     c1, c2 = st.columns(2)
