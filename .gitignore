@@ -4,3 +4,5 @@ data/raw/
 data/cleaned/
 __pycache__/
 .ipynb_checkpoints/
+.agents/
+.claude/ 
