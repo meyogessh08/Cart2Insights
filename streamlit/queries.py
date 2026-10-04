@@ -209,3 +209,36 @@ def reviews_by_category(p):
     """
     return run_query_filtered(sql, p, ITEMS_PARAMS)
 
+@st.cache_data(ttl=600, show_spinner=False)
+def seller_rank_by_category(p):
+    """Uses RANK() window function to find the top seller within each category by revenue."""
+    sql = ITEMS_CTE + """
+    , ranked AS (
+        SELECT category, seller_id,
+               SUM(price + freight_value) AS revenue,
+               RANK() OVER (PARTITION BY category ORDER BY SUM(price + freight_value) DESC) AS rnk
+        FROM filtered_items
+        WHERE category IS NOT NULL
+        GROUP BY category, seller_id
+    )
+    SELECT category, seller_id, revenue
+    FROM ranked WHERE rnk = 1
+    ORDER BY revenue DESC
+    LIMIT 10
+    """
+    return run_query_filtered(sql, p, ITEMS_PARAMS)
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def rating_vs_delivery_speed(p):
+    """Rating vs delivery performance, for Customer Experience tab."""
+    sql = ORDERS_CTE + """
+    SELECT r.review_score,
+           AVG(DATEDIFF(fo.order_delivered_customer_date, fo.order_purchase_timestamp)) AS avg_delivery_days
+    FROM filtered_orders fo
+    JOIN order_reviews r ON r.order_id = fo.order_id
+    WHERE fo.order_delivered_customer_date IS NOT NULL
+    GROUP BY r.review_score ORDER BY r.review_score
+    """
+    return run_query_filtered(sql, p, ORDERS_PARAMS)
+

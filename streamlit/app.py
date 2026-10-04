@@ -128,6 +128,9 @@ with tabs[3]:
     fig.update_layout(template=DARK, height=400)
     st.plotly_chart(fig, use_container_width=True)
 
+    st.subheader("Top Seller per Category (window function: RANK)")
+    st.dataframe(q.seller_rank_by_category(p), use_container_width=True, hide_index=True)
+
 # ---------- 5. Delivery ----------
 with tabs[4]:
     d = q.delivery_summary(p).iloc[0]
@@ -180,3 +183,9 @@ with tabs[5]:
     with c2:
         st.subheader("Avg Rating by Category (min 20 reviews)")
         st.dataframe(q.reviews_by_category(p), use_container_width=True, hide_index=True)
+
+    st.subheader("Rating vs Delivery Speed")
+    rvd = q.rating_vs_delivery_speed(p)
+    fig = px.bar(rvd, x="review_score", y="avg_delivery_days", color_discrete_sequence=[ACCENT])
+    fig.update_layout(template=DARK, height=350)
+    st.plotly_chart(fig, use_container_width=True)
