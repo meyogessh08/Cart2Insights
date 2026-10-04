@@ -67,16 +67,6 @@ with tabs[0]:
         fig.update_traces(textinfo="label+percent")
         st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Key Insights")
-    st.info(
-        "Delivery delays significantly hurt satisfaction — on-time orders average "
-        "4.29 stars vs 2.57 stars for delayed ones (Welch's T-test, p < 0.001).\n\n"
-        "Order value varies significantly across product categories — from R$71 "
-        "(telephony) to R$201 (watches_gifts) (One-Way ANOVA + Kruskal-Wallis, p < 0.001).\n\n"
-        "Payment method is associated with order outcome — vouchers show ~2.4x the "
-        "problem-order rate of credit cards (Chi-Square, p < 0.001)."
-    )
-
 # ---------- 2. Sales ----------
 with tabs[1]:
     st.subheader("Monthly Revenue Trend")
